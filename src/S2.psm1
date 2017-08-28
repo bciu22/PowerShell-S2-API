@@ -21,12 +21,15 @@ function Connect-S2Service {
         $Password,
         [parameter(Mandatory=$true)]
         [String]
-        $S2URL
+        $S2HOSTNAME,
+        [String]
+        $S2PROTOCOL = "https://"
     )
-    Set-Variable -Scope Global -Name "S2NETBOXURL" -Value $S2URL
+    Set-Variable -Scope Global -Name "S2HOSTNAME" -Value $S2HOSTNAME
+    Set-Variable -Scope Global -Name "S2PROTOCOL" -Value $S2PROTOCOL
 
     $xml = "<NETBOX-API><COMMAND name=`"Login`" num=`"1`" dateformat=`"tzoffset`"><PARAMS><USERNAME>$Username</USERNAME><PASSWORD>$Password</PASSWORD></PARAMS></COMMAND></NETBOX-API>"
-    $Response = Invoke-WebRequest -URI "$S2NETBOXURL/goforms/nbapi" -Method Post -Body $xml
+    $Response = Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml
 
     Set-Variable -Scope Global -Name "NETBOXSessionID" -Value $($([xml]$Response.content).NETBOX.sessionid)
 
@@ -34,7 +37,7 @@ function Connect-S2Service {
 
 function Disconnect-S2Service {
     $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"Logout`" num=`"1`" dateformat=`"tzoffset`"></COMMAND></NETBOX-API>"
-    Invoke-WebRequest -URI "$S2NETBOXURL/goforms/nbapi" -Method Post -Body $xml
+    Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml
 }
 
 function Get-S2Person {
@@ -42,7 +45,7 @@ function Get-S2Person {
         $PersonID
     )
     $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetPerson`" num=`"1`" dateformat=`"tzoffset`"><PARAMS><PERSONID>$PersonID</PERSONID></PARAMS></COMMAND></NETBOX-API>"
-    $([XML]$(Invoke-WebRequest -URI "$S2NETBOXURL/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
 
 }
 
@@ -57,10 +60,10 @@ function Get-S2PersonPhoto {
     $cookie = New-Object System.Net.Cookie 
     $cookie.Name = ".sessionId"
     $cookie.Value = $NETBOXSessionID
-    $cookie.Domain = $S2NETBOXURL
+    $cookie.Domain = $S2HOSTNAME
     $session.Cookies.Add($cookie);
 
-    $S2URL = "$S2NETBOXURL/upload/pics/$($Person.PICTUREURL)"
+    $S2URL = "$($S2PROTOCOL)$($S2HOSTNAME)/upload/pics/$($Person.PICTUREURL)"
     $Photo = Invoke-WebRequest -URI $S2URL -Method GET -WebSession $session
     if ($OutFile)
     {
