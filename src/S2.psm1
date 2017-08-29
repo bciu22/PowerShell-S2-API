@@ -67,7 +67,7 @@ Function Search-S2Person {
     
 
     $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"SearchPersonData`" num=`"1`" dateformat=`"tzoffset`"><PARAMS>$Params</PARAMS></COMMAND></NETBOX-API>"
-    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.PEOPLE.PERSON
 
 }
 
