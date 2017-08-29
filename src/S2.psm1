@@ -40,6 +40,37 @@ function Disconnect-S2Service {
     Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml
 }
 
+
+Function Search-S2Person {
+    Param(
+        $PersonID,
+        $UDF1,
+        $UDF2,
+        $UDF3
+    )
+    if ($PersonID)
+    {
+        $params="<PERSONID>$PersonID</PERSONID>"
+    }
+    elseif ($UDF1)
+    {
+        $params="<UDF1>$UDF1</UDF1>"
+    }
+    elseif($UDF2)
+    {
+        $params="<UDF2>$UDF2</UDF2>"
+    }
+    elseif($UDF3)
+    {
+        $params="<UDF3>$UDF3</UDF3>"
+    }
+    
+
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"SearchPersonData`" num=`"1`" dateformat=`"tzoffset`"><PARAMS>$Params</PARAMS></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
+
+}
+
 function Get-S2Person {
     Param(
         $PersonID
