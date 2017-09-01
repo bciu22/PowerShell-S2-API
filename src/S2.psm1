@@ -65,31 +65,76 @@ function Disconnect-S2Service {
 
 Function Search-S2Person {
     Param(
+        $LastName,
+        $MiddleName,
+        $FirstName,
         $PersonID,
         $UDF1,
         $UDF2,
         $UDF3
     )
+
+    [xml]$xml = New-Object System.Xml.XmlDocument
+    $wrapper = $xml.AppendChild($xml.CreateElement("NETBOX-API"))
+    $wrapper.SetAttribute("sessionid",$NETBOXSessionID)
+    $command = $wrapper.AppendChild($xml.CreateElement("COMMAND"))
+    $Command.SetAttribute("name","SearchPersonData")
+    $Command.SetAttribute("num","1")
+    $Command.SetAttribute("dateformat","tzoffset")
+    $Parameters=$Command.AppendChild($xml.CreateElement("PARAMS"))
+
+    if ($LastName)
+    {
+        $param = $xml.CreateElement("LASTNAME")
+        $param.innerText = $LastName
+        $Parameters.AppendChild($Param) | Out-Null
+    }
+    if($MiddleName)
+    {
+        $param = $xml.CreateElement("MIDDLENAME")
+        $param.innerText = $MiddleName
+        $Parameters.AppendChild($Param) | Out-Null
+    }
+    if ($FirstName)
+    {
+        $param = $xml.CreateElement("FIRSTNAME")
+        $param.innerText = $FirstName
+        $Parameters.AppendChild($Param) | Out-Null
+    }
     if ($PersonID)
     {
-        $params="<PERSONID>$PersonID</PERSONID>"
+        $param = $xml.CreateElement("PERSONID")
+        $param.innerText = $PersonID
+        $Parameters.AppendChild($Param) | Out-Null
     }
-    elseif ($UDF1)
+    if ($UDF1)
     {
-        $params="<UDF1>$UDF1</UDF1>"
+        $param = $xml.CreateElement("UDF1")
+        $param.innerText = $UDF1
+        $Parameters.AppendChild($Param) | Out-Null
     }
-    elseif($UDF2)
+    if($UDF2)
     {
-        $params="<UDF2>$UDF2</UDF2>"
+        $param = $xml.CreateElement("UDF2")
+        $param.innerText = $UDF2
+        $Parameters.AppendChild($Param) | Out-Null
     }
-    elseif($UDF3)
+    if($UDF3)
     {
-        $params="<UDF3>$UDF3</UDF3>"
+        $param = $xml.CreateElement("UDF3")
+        $param.innerText = $UDF3
+        $Parameters.AppendChild($Param) | Out-Null
     }
-    
 
-    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"SearchPersonData`" num=`"1`" dateformat=`"tzoffset`"><PARAMS>$Params</PARAMS></COMMAND></NETBOX-API>"
-    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.PEOPLE.PERSON
+    $param = $xml.CreateElement("CASEINSENSITIVE")
+    $param.innerText = "TRUE"
+    $Parameters.AppendChild($Param) | Out-Null
+
+    $param = $xml.CreateElement("WILDCARDSEARCH")
+    $param.innerText = "TRUE"
+    $Parameters.AppendChild($Param) | Out-Null
+
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml.innerXML).content).NETBOX.RESPONSE.DETAILS.PEOPLE.PERSON
 
 }
 
