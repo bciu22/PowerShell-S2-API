@@ -150,7 +150,9 @@ function Get-S2Person {
 function Get-S2PersonPhoto {
     Param(
         $PersonID,
-        $OutFile
+        $OutFile,
+        [Switch]
+        $Display
     )
     $Person = Get-S2Person -PersonID $PersonID
 
@@ -163,7 +165,22 @@ function Get-S2PersonPhoto {
 
     $S2URL = "$($S2PROTOCOL)$($S2HOSTNAME)/upload/pics/$($Person.PICTUREURL)"
     $Photo = Invoke-WebRequest -URI $S2URL -Method GET -WebSession $session
-    if ($OutFile)
+
+    if ($Display)
+    {
+        $Stream =[System.IO.MemoryStream]::new($Photo.content)
+        $img = [System.Drawing.Image]::FromStream($Stream)
+        Add-Type -AssemblyName System.Windows.Forms
+        $win = New-Object Windows.Forms.Form
+        $box = New-Object Windows.Forms.PictureBox
+        $box.Width = $img.Width
+        $box.Height = $img.Height
+        $box.Image = $img
+        $win.Controls.Add($box)
+        $win.AutoSize = $true
+        $win.ShowDialog()
+    }
+    elseif ($OutFile)
     {
         [System.IO.File]::WriteAllBytes($OutFile,$Photo.content)
     }
