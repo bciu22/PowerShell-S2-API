@@ -28,10 +28,32 @@ function Connect-S2Service {
     Set-Variable -Scope Global -Name "S2HOSTNAME" -Value $S2HOSTNAME
     Set-Variable -Scope Global -Name "S2PROTOCOL" -Value $S2PROTOCOL
 
-    $xml = "<NETBOX-API><COMMAND name=`"Login`" num=`"1`" dateformat=`"tzoffset`"><PARAMS><USERNAME>$Username</USERNAME><PASSWORD>$Password</PASSWORD></PARAMS></COMMAND></NETBOX-API>"
-    $Response = Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml
+    [xml]$xml = New-Object System.Xml.XmlDocument
+    $wrapper = $xml.AppendChild($xml.CreateElement("NETBOX-API"))
+    $command = $wrapper.AppendChild($xml.CreateElement("COMMAND"))
+    $Command.SetAttribute("name","Login")
+    $Command.SetAttribute("num","1")
+    $Command.SetAttribute("dateformat","tzoffset")
+    $Parameters=$Command.AppendChild($xml.CreateElement("PARAMS"))
+    $UsernameXML = $xml.CreateElement("USERNAME")
+    $UsernameXML.innerText = $Username
+    $PasswordXML = $xml.CreateElement("PASSWORD")
+    $PasswordXML.InnerText = $Password
+    $Parameters.AppendChild($UsernameXML) | Out-Null
+    $Parameters.AppendChild($PasswordXML) | Out-Null
 
-    Set-Variable -Scope Global -Name "NETBOXSessionID" -Value $($([xml]$Response.content).NETBOX.sessionid)
+    $Response = Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $($xml.innerXML)
+    $ReturnXML = $([xml]$Response.content)
+
+    if ($ReturnXML.NETBOX.RESPONSE.APIERROR)
+    {
+        throw "Unable to connect to NETBOX-API.  Error code: $($ReturnXML.NETBOX.RESPONSE.APIERROR)"
+    }
+    else
+    {
+        Set-Variable -Scope Global -Name "NETBOXSessionID" -Value $($ReturnXML.NETBOX.sessionid)
+    }
+    
 
 }
 
