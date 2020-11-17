@@ -143,7 +143,7 @@ Function Search-S2Person {
 
 Function Get-S2Person {
     param(
-        $PersonID
+        [parameter(Mandatory=$true)][String] $PersonID
     )
     $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetPerson`" num=`"1`" dateformat=`"tzoffset`"><PARAMS><PERSONID>$PersonID</PERSONID></PARAMS></COMMAND></NETBOX-API>"
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
@@ -157,6 +157,19 @@ Function Get-S2AccessLevels {
 Function Get-S2CardFormats {
     $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetCardFormats`" num=`"1`"></COMMAND></NETBOX-API>"
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.CARDFORMATS.CARDFORMAT
+}
+
+Function Get-S2TimeSpec {
+    param(
+        [parameter(Mandatory=$true)][String] $TimeSpecKey
+    )
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetTimeSpec`" num=`"1`"><PARAMS><TIMESPECKEY>$TimeSpecKey</TIMESPECKEY></PARAMS></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.TIMESPEC
+}
+
+Function Get-S2TimeSpecs {
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetTimeSpecs`" num=`"1`"></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.TIMESPECS.TIMESPEC
 }
 
 Function Get-S2PersonPhoto {
