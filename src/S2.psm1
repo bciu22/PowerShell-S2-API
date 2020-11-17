@@ -1,9 +1,9 @@
 <#
  .Synopsis
-  Module for interfacing with the S2 NETBOX API.
+  Establishes a connection to the S2 NETBOX API.
 
  .Description
-  Module for enterying and querying information from the S2 NETBOX API.
+  Establishes a connection to the S2 NETBOX API for querying and modifying data.
 
  .Parameter Username
   Valid username of an S2 Account
@@ -66,7 +66,6 @@ Function Disconnect-S2Service {
     $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"Logout`" num=`"1`" dateformat=`"tzoffset`"></COMMAND></NETBOX-API>"
     Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml | Out-Null
 }
-
 
 Function Search-S2Person {
     param(
