@@ -365,11 +365,19 @@ Function New-S2Person {
   
  .Parameter UDF1
   Specify the value you want stored in the UDF1 field.  Format is going to be the same for the other UDFs.
+  
+ .Parameter Undelete
+  Specify this parameter will undelete a deleted person.
 
  .Example 
   C:\PS> Edit-S2Person -PersonID _100 -AccessLevels "Access Level Group 1","Access Level Group 2","Access Level Group 3"
   This will edit the access levels of a person with the ID of _100 so that person only has access to the specified Access Levels that
   are specified at in the command.
+
+ .Example 
+  C:\PS> Edit-S2Person -PersonID _100 -Undelete
+  This will undelete (reenable) the person with the ID of _100 if they where previously deleted.
+  Note: They will not have Credntials or AccessLevels when they are undeleted unless you give them access at the time you undelete.
 #>
 Function Edit-S2Person {
     param(
@@ -386,7 +394,8 @@ Function Edit-S2Person {
         [String] $UDF6,
         [String] $UDF7,
         [String] $UDF8,
-        [String] $UDF9
+        [String] $UDF9,
+        [Switch] $Undelete
     )
 
     [xml]$xml = New-Object System.Xml.XmlDocument
@@ -479,6 +488,12 @@ Function Edit-S2Person {
     {
         $param = $xml.CreateElement("UDF9")
         $param.innerText = $UDF9
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($Undelete)
+    {
+        $param = $xml.CreateElement("DELETED")
+        $param.innerText = "FALSE"
         $Parameters.AppendChild($param) | Out-Null
     }
 
