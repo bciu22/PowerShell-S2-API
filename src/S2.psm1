@@ -200,6 +200,335 @@ Function Get-S2PersonPhoto {
     }
 }
 
+<#
+ .Synopsis
+  Function for creating new person in the S2 system.
+
+ .Description
+  Allows for the creation of a new person in the S2 NETBOX system.
+
+ .Parameter PersonID
+  If you want to specify a specific Person ID instead of letting the system auto generate one.
+
+ .Parameter FirstName
+  Specify the person's first name.
+
+ .Parameter LastName
+  Specify the person's last name.
+
+ .Parameter MiddleName
+  Specify the person's middle name.
+
+ .Parameter AccessLevels
+  Specify what Access Levels you want a person to be added to.  
+  
+ .Parameter UDF1
+  Specify the value you want stored in the UDF1 field.  Format is going to be the same for the other UDFs.
+
+ .Example 
+  C:\PS> New-S2Person -FirstName John -LastName Smith
+  Will create a person with the First Name of John and Last Name of Smith.
+#>
+Function New-S2Person {
+    param(
+        [String] $PersonID,
+        [parameter(Mandatory=$true)][String] $FirstName,
+        [parameter(Mandatory=$true)][String] $LastName,
+        [String] $MiddleName,
+        [String[]] $AccessLevels,
+        [String] $UDF1,
+        [String] $UDF2,
+        [String] $UDF3,
+        [String] $UDF4,
+        [String] $UDF5,
+        [String] $UDF6,
+        [String] $UDF7,
+        [String] $UDF8,
+        [String] $UDF9
+    )
+
+    [xml]$xml = New-Object System.Xml.XmlDocument
+    $wrapper = $xml.AppendChild($xml.CreateElement("NETBOX-API"))
+    $wrapper.SetAttribute("sessionid",$NETBOXSessionID)
+    $command = $wrapper.AppendChild($xml.CreateElement("COMMAND"))
+    $Command.SetAttribute("name","AddPerson")
+    $Command.SetAttribute("num","1")
+    $Parameters=$Command.AppendChild($xml.CreateElement("PARAMS"))
+    if($PersonID)
+    {
+        $param = $xml.CreateElement("PERSONID")
+        $param.innerText = $PersonID
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    $param = $xml.CreateElement("FIRSTNAME")
+    $param.innerText = $FirstName
+    $Parameters.AppendChild($param) | Out-Null
+    $param = $xml.CreateElement("LASTNAME")
+    $param.innerText = $LastName
+    $Parameters.AppendChild($param) | Out-Null
+    if($MiddleName)
+    {
+        $param = $xml.CreateElement("MIDDLENAME")
+        $param.innerText = $MiddleName
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($ACCESSLEVELS)
+    {
+        $param = $xml.CreateElement("ACCESSLEVELS")
+        foreach($ACCESSLEVEL in $ACCESSLEVELS) {
+            $ParamAccessLevel = $xml.CreateElement('ACCESSLEVEL')
+            $ParamAccessLevel.innerText = $AccessLevel
+            $param.AppendChild($ParamAccessLevel) | Out-Null
+        }
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF1)
+    {
+        $param = $xml.CreateElement("UDF1")
+        $param.innerText = $UDF1
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF2)
+    {
+        $param = $xml.CreateElement("UDF2")
+        $param.innerText = $UDF2
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF3)
+    {
+        $param = $xml.CreateElement("UDF3")
+        $param.innerText = $UDF3
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF3)
+    {
+        $param = $xml.CreateElement("UDF4")
+        $param.innerText = $UDF4
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF3)
+    {
+        $param = $xml.CreateElement("UDF5")
+        $param.innerText = $UDF5
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF3)
+    {
+        $param = $xml.CreateElement("UDF6")
+        $param.innerText = $UDF6
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF3)
+    {
+        $param = $xml.CreateElement("UDF7")
+        $param.innerText = $UDF7
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF3)
+    {
+        $param = $xml.CreateElement("UDF8")
+        $param.innerText = $UDF8
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF3)
+    {
+        $param = $xml.CreateElement("UDF9")
+        $param.innerText = $UDF9
+        $Parameters.AppendChild($param) | Out-Null
+    }
+  
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
+}
+
+<#
+ .Synopsis
+  Edit an already created person in the S2 system.
+
+ .Description
+  Allows for editing the fields that are assocated with an already existing person.
+
+ .Parameter PersonID
+  The ID of the person you are targeting.
+
+ .Parameter FirstName
+  Used for changing the value of the person's first name.
+
+ .Parameter LastName
+  Used for changing the value of the person's last name.
+
+ .Parameter MiddleName
+  Used for changing the value of the person's middle name.
+
+ .Parameter AccessLevels
+  Specify what Access Levels you want a person to be added to.  
+  IMPORTANT: Any Access Levels not specified are removed.
+  
+ .Parameter UDF1
+  Specify the value you want stored in the UDF1 field.  Format is going to be the same for the other UDFs.
+
+ .Example 
+  C:\PS> Edit-S2Person -PersonID _100 -AccessLevels "Access Level Group 1","Access Level Group 2","Access Level Group 3"
+  This will edit the access levels of a person with the ID of _100 so that person only has access to the specified Access Levels that
+  are specified at in the command.
+#>
+Function Edit-S2Person {
+    param(
+        [parameter(Mandatory=$true)][String] $PersonID,
+        [String] $FirstName,
+        [String] $LastName,
+        [String] $MiddleName,
+        [String[]] $AccessLevels,
+        [String] $UDF1,
+        [String] $UDF2,
+        [String] $UDF3,
+        [String] $UDF4,
+        [String] $UDF5,
+        [String] $UDF6,
+        [String] $UDF7,
+        [String] $UDF8,
+        [String] $UDF9
+    )
+
+    [xml]$xml = New-Object System.Xml.XmlDocument
+    $wrapper = $xml.AppendChild($xml.CreateElement("NETBOX-API"))
+    $wrapper.SetAttribute("sessionid",$NETBOXSessionID)
+    $command = $wrapper.AppendChild($xml.CreateElement("COMMAND"))
+    $Command.SetAttribute("name","ModifyPerson")
+    $Command.SetAttribute("num","1")
+    $Parameters=$Command.AppendChild($xml.CreateElement("PARAMS"))
+    $param = $xml.CreateElement("PERSONID")
+    $param.innerText = $PersonID
+    $Parameters.AppendChild($param) | Out-Null
+    if($FirstName)
+    {
+        $param = $xml.CreateElement("FIRSTNAME")
+        $param.innerText = $FirstName
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($LastName)
+    {
+        $param = $xml.CreateElement("LASTNAME")
+        $param.innerText = $LastName
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($MiddleName)
+    {
+        $param = $xml.CreateElement("MIDDLENAME")
+        $param.innerText = $MiddleName
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($ACCESSLEVELS)
+    {
+        $param = $xml.CreateElement("ACCESSLEVELS")
+        foreach($ACCESSLEVEL in $ACCESSLEVELS) {
+            $ParamAccessLevel = $xml.CreateElement('ACCESSLEVEL')
+            $ParamAccessLevel.innerText = $AccessLevel
+            $param.AppendChild($ParamAccessLevel) | Out-Null
+        }
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF1)
+    {
+        $param = $xml.CreateElement("UDF1")
+        $param.innerText = $UDF1
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF2)
+    {
+        $param = $xml.CreateElement("UDF2")
+        $param.innerText = $UDF2
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF3)
+    {
+        $param = $xml.CreateElement("UDF3")
+        $param.innerText = $UDF3
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF4)
+    {
+        $param = $xml.CreateElement("UDF4")
+        $param.innerText = $UDF4
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF5)
+    {
+        $param = $xml.CreateElement("UDF5")
+        $param.innerText = $UDF5
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF6)
+    {
+        $param = $xml.CreateElement("UDF6")
+        $param.innerText = $UDF6
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF7)
+    {
+        $param = $xml.CreateElement("UDF7")
+        $param.innerText = $UDF7
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF8)
+    {
+        $param = $xml.CreateElement("UDF8")
+        $param.innerText = $UDF8
+        $Parameters.AppendChild($param) | Out-Null
+    }
+    if($UDF9)
+    {
+        $param = $xml.CreateElement("UDF9")
+        $param.innerText = $UDF9
+        $Parameters.AppendChild($param) | Out-Null
+    }
+
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
+}
+
+<#
+ .Synopsis
+  Allows you to remove a person who should no longer have access.  
+
+ .Description
+  Allows you to remove a person who should no longer have access.  
+  Note: Remove-S2Person disables the person record, leaving it in the database so that reports of history continue to function. 
+  Access levels and credential records are deleted. 
+
+ .Parameter PersonID
+  The PersonID of the person you are wishing to remove.
+
+ .Example 
+  C:\PS> Remove-S2Person _100
+  Will disable a person with the Person ID of _100 and remove all access given to their person account.
+#>
+Function Remove-S2Person {
+    param(
+        [parameter(Mandatory=$true)][String] $PersonID
+    )
+
+    [xml]$xml = New-Object System.Xml.XmlDocument
+    $wrapper = $xml.AppendChild($xml.CreateElement("NETBOX-API"))
+    $wrapper.SetAttribute("sessionid",$NETBOXSessionID)
+    $command = $wrapper.AppendChild($xml.CreateElement("COMMAND"))
+    $Command.SetAttribute("name","RemovePerson")
+    $Command.SetAttribute("num","1")
+    $Parameters=$Command.AppendChild($xml.CreateElement("PARAMS"))
+    $param = $xml.CreateElement("PERSONID")
+    $param.innerText = $PersonID
+    $Parameters.AppendChild($param) | Out-Null
+    
+    $Response = Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml
+    $ReturnXML = $([xml]$Response.content)
+
+    switch ($ReturnXML.NETBOX.RESPONSE.CODE) {
+        "SUCCESS" { Return $true  }
+        Default { 
+            Write-Output $ReturnXML.NETBOX.RESPONSE.CODE
+            Return $false 
+        }
+    }
+}
+
 Function Add-S2Credential {
     param(
         [parameter(Mandatory=$true)][String] $PersonID,
