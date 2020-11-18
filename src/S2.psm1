@@ -149,72 +149,11 @@ Function Get-S2Person {
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
 }
 
-Function Get-S2AccessLevel {
-    param(
-        [parameter(Mandatory=$true)][String] $AccessLevelKey
-        # [parameter(Mandatory=$true)][String] $ACCESSLEVELNAME
-    )
-    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetAccessLevel`" num=`"1`"><PARAMS><ACCESSLEVELKEY>$AccessLevelKey</ACCESSLEVELKEY></PARAMS></COMMAND></NETBOX-API>"
-    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
-}
-
-Function Get-S2AccessLevels {
-    param(
-        [Switch] $WantKey
-    )
-    [xml]$xml = New-Object System.Xml.XmlDocument
-    $wrapper = $xml.AppendChild($xml.CreateElement("NETBOX-API"))
-    $wrapper.SetAttribute("sessionid",$NETBOXSessionID)
-    $command = $wrapper.AppendChild($xml.CreateElement("COMMAND"))
-    $Command.SetAttribute("name","GetAccessLevels")
-    $Command.SetAttribute("num","1")
-    if($WantKey)
-    {
-        $Parameters=$Command.AppendChild($xml.CreateElement("PARAMS"))
-        $param = $xml.CreateElement("WANTKEY")
-        $param.innerText = ("TRUE")
-        $Parameters.AppendChild($param) | Out-Null
-    }
-
-    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.ACCESSLEVELS.ACCESSLEVEL
-}
-
-Function Get-S2CardFormats {
-    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetCardFormats`" num=`"1`"></COMMAND></NETBOX-API>"
-    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.CARDFORMATS.CARDFORMAT
-}
-
-Function Get-S2PortalGroup {
-    param(
-        [parameter(Mandatory=$true)][String] $PortalKey
-    )
-    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetPortalGroup`" num=`"1`"><PARAMS><PORTALGROUPKEY>$PortalKey</PORTALGROUPKEY></PARAMS></COMMAND></NETBOX-API>"
-    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.PORTALGROUP
-}
-
-Function Get-S2PortalGroups {
-    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetPortalGroups`" num=`"1`"></COMMAND></NETBOX-API>"
-    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.PORTALGROUPS.PORTALGROUP
-}
-
-Function Get-S2TimeSpec {
-    param(
-        [parameter(Mandatory=$true)][String] $TimeSpecKey
-    )
-    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetTimeSpec`" num=`"1`"><PARAMS><TIMESPECKEY>$TimeSpecKey</TIMESPECKEY></PARAMS></COMMAND></NETBOX-API>"
-    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.TIMESPEC
-}
-
-Function Get-S2TimeSpecs {
-    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetTimeSpecs`" num=`"1`"></COMMAND></NETBOX-API>"
-    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.TIMESPECS.TIMESPEC
-}
-
 Function Get-S2PersonPhoto {
     param(
-        $PersonID,
+        [parameter(Mandatory=$true)][String] $PersonID,
         $OutFile,
-        [Switch]$Display
+        [Switch] $Display
     )
     $Person = Get-S2Person -PersonID $PersonID
 
@@ -595,6 +534,41 @@ Function Remove-S2Person {
     }
 }
 
+Function Get-S2AccessLevel {
+    param(
+        [parameter(Mandatory=$true)][String] $AccessLevelKey
+        # [parameter(Mandatory=$true)][String] $ACCESSLEVELNAME
+    )
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetAccessLevel`" num=`"1`"><PARAMS><ACCESSLEVELKEY>$AccessLevelKey</ACCESSLEVELKEY></PARAMS></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
+}
+
+Function Get-S2AccessLevels {
+    param(
+        [Switch] $WantKey
+    )
+    [xml]$xml = New-Object System.Xml.XmlDocument
+    $wrapper = $xml.AppendChild($xml.CreateElement("NETBOX-API"))
+    $wrapper.SetAttribute("sessionid",$NETBOXSessionID)
+    $command = $wrapper.AppendChild($xml.CreateElement("COMMAND"))
+    $Command.SetAttribute("name","GetAccessLevels")
+    $Command.SetAttribute("num","1")
+    if($WantKey)
+    {
+        $Parameters=$Command.AppendChild($xml.CreateElement("PARAMS"))
+        $param = $xml.CreateElement("WANTKEY")
+        $param.innerText = ("TRUE")
+        $Parameters.AppendChild($param) | Out-Null
+    }
+
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.ACCESSLEVELS.ACCESSLEVEL
+}
+
+Function Get-S2CardFormats {
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetCardFormats`" num=`"1`"></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.CARDFORMATS.CARDFORMAT
+}
+
 Function Add-S2Credential {
     param(
         [parameter(Mandatory=$true)][String] $PersonID,
@@ -665,4 +639,30 @@ Function Remove-S2Credential {
             Return $false 
         }
     }
+}
+
+Function Get-S2PortalGroup {
+    param(
+        [parameter(Mandatory=$true)][String] $PortalKey
+    )
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetPortalGroup`" num=`"1`"><PARAMS><PORTALGROUPKEY>$PortalKey</PORTALGROUPKEY></PARAMS></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.PORTALGROUP
+}
+
+Function Get-S2PortalGroups {
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetPortalGroups`" num=`"1`"></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.PORTALGROUPS.PORTALGROUP
+}
+
+Function Get-S2TimeSpec {
+    param(
+        [parameter(Mandatory=$true)][String] $TimeSpecKey
+    )
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetTimeSpec`" num=`"1`"><PARAMS><TIMESPECKEY>$TimeSpecKey</TIMESPECKEY></PARAMS></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.TIMESPEC
+}
+
+Function Get-S2TimeSpecs {
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetTimeSpecs`" num=`"1`"></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.TIMESPECS.TIMESPEC
 }
