@@ -159,6 +159,19 @@ Function Get-S2CardFormats {
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.CARDFORMATS.CARDFORMAT
 }
 
+Function Get-S2PortalGroup {
+    param(
+        [parameter(Mandatory=$true)][String] $PortalKey
+    )
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetPortalGroup`" num=`"1`"><PARAMS><PORTALGROUPKEY>$PortalKey</PORTALGROUPKEY></PARAMS></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.PORTALGROUP
+}
+
+Function Get-S2PortalGroups {
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetPortalGroups`" num=`"1`"></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.PORTALGROUPS.PORTALGROUP
+}
+
 Function Get-S2TimeSpec {
     param(
         [parameter(Mandatory=$true)][String] $TimeSpecKey
