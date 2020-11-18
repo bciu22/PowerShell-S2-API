@@ -654,6 +654,19 @@ Function Get-S2PortalGroups {
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.PORTALGROUPS.PORTALGROUP
 }
 
+Function Get-S2ReaderGroup {
+    param(
+        [parameter(Mandatory=$true)][String] $ReaderGroupKey
+    )
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetReaderGroup`" num=`"1`"><PARAMS><READERGROUPKEY>$ReaderGroupKey</READERGROUPKEY></PARAMS></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.READERGROUP
+}
+
+Function Get-S2ReaderGroups {
+    $xml = "<NETBOX-API sessionid=`"$NETBOXSessionID`"><COMMAND name=`"GetReaderGroups`" num=`"1`"></COMMAND></NETBOX-API>"
+    $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS.READERGROUPS.READERGROUP
+}
+
 Function Get-S2TimeSpec {
     param(
         [parameter(Mandatory=$true)][String] $TimeSpecKey
