@@ -149,6 +149,13 @@ Function Get-S2Person {
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
 }
 
+Function Get-S2PersonAccessLevels {
+    param(
+        [parameter(Mandatory=$true)][String] $PersonID
+    )
+    $(Get-S2Person $PersonID).ACCESSLEVELS.ACCESSLEVEL
+}
+
 Function Get-S2PersonPhoto {
     param(
         [parameter(Mandatory=$true)][String] $PersonID,
@@ -350,7 +357,7 @@ Function New-S2Person {
   Used for changing the value of the person's middle name.
 
  .Parameter AccessLevels
-  Specify what Access Levels you want a person to be added to.  
+  Specify what Access Levels you want a person to be added to.
   IMPORTANT: Any Access Levels not specified are removed.
   
  .Parameter UDF1
@@ -488,6 +495,52 @@ Function Edit-S2Person {
     }
 
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
+}
+
+<#
+ .Synopsis
+  Allows you to a Access Level to a person list of existing Access Levels.  
+
+ .Description
+  Allows you to add Access Levels to a person's existing Access Levels.  
+
+ .Parameter PersonID
+  The PersonID of the person you are wanting to change.
+
+ .Parameter AccessLevels
+  Specify what Access Level or Levels you want the person to be added to.
+#>
+Function Add-S2PersonAccessLevels {
+    param(
+        [parameter(Mandatory=$true)][String] $PersonID,
+        [parameter(Mandatory=$true)][String[]] $AccessLevels
+    )
+    $ExistingAccessLevels = Get-S2PersonAccessLevels $PersonID
+    Edit-S2Person -PersonID $PersonID -AccessLevels $($AccessLevels + $ExistingAccessLevels)
+}
+
+<#
+ .Synopsis
+  Allows you to remove one or multiple Access Level assigned to a Person.
+
+ .Description
+  Allows you to remove one or multiple Access Level assigned to a Person. 
+  You do have to specify specify which Access Levels you wanting to be removed thouogh.
+
+ .Parameter PersonID
+  The PersonID of the person you are wanting to change.
+
+ .Parameter AccessLevels
+  Specify what Access Level or Levels you want the person to be removed from.
+#>
+Function Remove-S2PersonAccessLevels {
+param(
+    [parameter(Mandatory=$true)][String] $PersonID,
+    [parameter(Mandatory=$true)][String[]] $AccessLevels
+
+    )
+    $ExistingAccessLevels = Get-S2PersonAccessLevels $PersonID
+    Edit-S2Person -PersonID $PersonID -AccessLevels $(Compare-Object $AccessLevels $ExistingAccessLevels | Select-Object -ExpandProperty InputObject)
 }
 
 <#
