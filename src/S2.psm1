@@ -1,3 +1,4 @@
+Function Connect-S2Service {
 <#
  .Synopsis
   Establishes a connection to the S2 NETBOX API.
@@ -21,11 +22,6 @@
   Forked from bciu22/PowerShell-S2-API
   https://github.com/bciu22/PowerShell-S2-API/blob/master/src/S2.psm1
 #>
-Function Connect-S2Service {
-    <#
-    .PARAMETER Username
-    .PARAMETER Password
-    #>
     param (
         [parameter(Mandatory=$true)][String] $Username,
         [parameter(Mandatory=$true)][String] $Password,
@@ -197,6 +193,7 @@ Function Get-S2PersonPhoto {
     }
 }
 
+Function New-S2Person {
 <#
  .Synopsis
   Function for creating new person in the S2 system.
@@ -226,7 +223,6 @@ Function Get-S2PersonPhoto {
   C:\PS> New-S2Person -FirstName John -LastName Smith
   Will create a person with the First Name of John and Last Name of Smith.
 #>
-Function New-S2Person {
     param(
         [String] $PersonID,
         [parameter(Mandatory=$true)][String] $FirstName,
@@ -337,6 +333,7 @@ Function New-S2Person {
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
 }
 
+Function Edit-S2Person {
 <#
  .Synopsis
   Edit an already created person in the S2 system.
@@ -376,7 +373,6 @@ Function New-S2Person {
   This will undelete (reenable) the person with the ID of _100 if they where previously deleted.
   Note: They will not have Credntials or AccessLevels when they are undeleted unless you give them access at the time you undelete.
 #>
-Function Edit-S2Person {
     param(
         [parameter(Mandatory=$true)][String] $PersonID,
         [String] $FirstName,
@@ -497,6 +493,7 @@ Function Edit-S2Person {
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
 }
 
+Function Add-S2PersonAccessLevels {
 <#
  .Synopsis
   Allows you to a Access Level to a person list of existing Access Levels.  
@@ -510,7 +507,6 @@ Function Edit-S2Person {
  .Parameter AccessLevels
   Specify what Access Level or Levels you want the person to be added to.
 #>
-Function Add-S2PersonAccessLevels {
     param(
         [parameter(Mandatory=$true)][String] $PersonID,
         [parameter(Mandatory=$true)][String[]] $AccessLevels
@@ -519,6 +515,8 @@ Function Add-S2PersonAccessLevels {
     Edit-S2Person -PersonID $PersonID -AccessLevels $($AccessLevels + $ExistingAccessLevels)
 }
 
+
+Function Remove-S2PersonAccessLevels {
 <#
  .Synopsis
   Allows you to remove one or multiple Access Level assigned to a Person.
@@ -533,16 +531,15 @@ Function Add-S2PersonAccessLevels {
  .Parameter AccessLevels
   Specify what Access Level or Levels you want the person to be removed from.
 #>
-Function Remove-S2PersonAccessLevels {
-param(
-    [parameter(Mandatory=$true)][String] $PersonID,
-    [parameter(Mandatory=$true)][String[]] $AccessLevels
-
+    param(
+        [parameter(Mandatory=$true)][String] $PersonID,
+        [parameter(Mandatory=$true)][String[]] $AccessLevels
     )
     $ExistingAccessLevels = Get-S2PersonAccessLevels $PersonID
     Edit-S2Person -PersonID $PersonID -AccessLevels $(Compare-Object $AccessLevels $ExistingAccessLevels | Select-Object -ExpandProperty InputObject)
 }
 
+Function Remove-S2Person {
 <#
  .Synopsis
   Allows you to remove a person who should no longer have access.  
@@ -559,7 +556,6 @@ param(
   C:\PS> Remove-S2Person _100
   Will disable a person with the Person ID of _100 and remove all access given to their person account.
 #>
-Function Remove-S2Person {
     param(
         [parameter(Mandatory=$true)][String] $PersonID
     )
