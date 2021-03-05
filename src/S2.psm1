@@ -71,7 +71,8 @@ Function Search-S2Person {
         [String] $PersonID,
         [String] $UDF1,
         [String] $UDF2,
-        [String] $UDF3
+        [String] $UDF3,
+        [Switch] $Deleted
     )
 
     [xml]$xml = New-Object System.Xml.XmlDocument
@@ -126,6 +127,17 @@ Function Search-S2Person {
         $Parameters.AppendChild($param) | Out-Null
     }
 
+    if($Deleted)
+    {
+        $param = $xml.CreateElement("DELETED")
+        $param.innerText = "ALL"
+        $Parameters.AppendChild($param) | Out-Null
+    } else {
+        $param = $xml.CreateElement("DELETED")
+        $param.innerText = "FALSE"
+        $Parameters.AppendChild($param) | Out-Null
+    }
+
     $param = $xml.CreateElement("CASEINSENSITIVE")
     $param.innerText = "TRUE"
     $Parameters.AppendChild($param) | Out-Null
@@ -145,7 +157,7 @@ Function Get-S2Person {
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
 }
 
-Function Get-S2PersonAccessLevels {
+Function Get-S2PersonAccessLevel {
     param(
         [parameter(Mandatory=$true)][String] $PersonID
     )
@@ -493,7 +505,7 @@ Function Edit-S2Person {
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
 }
 
-Function Add-S2PersonAccessLevels {
+Function Add-S2PersonAccessLevel {
 <#
  .Synopsis
   Allows you to a Access Level to a person list of existing Access Levels.  
@@ -511,12 +523,12 @@ Function Add-S2PersonAccessLevels {
         [parameter(Mandatory=$true)][String] $PersonID,
         [parameter(Mandatory=$true)][String[]] $AccessLevels
     )
-    $ExistingAccessLevels = Get-S2PersonAccessLevels $PersonID
+    $ExistingAccessLevels = Get-S2PersonAccessLevel $PersonID
     Edit-S2Person -PersonID $PersonID -AccessLevels $($AccessLevels + $ExistingAccessLevels)
 }
 
 
-Function Remove-S2PersonAccessLevels {
+Function Remove-S2PersonAccessLevel {
 <#
  .Synopsis
   Allows you to remove one or multiple Access Level assigned to a Person.
@@ -535,7 +547,7 @@ Function Remove-S2PersonAccessLevels {
         [parameter(Mandatory=$true)][String] $PersonID,
         [parameter(Mandatory=$true)][String[]] $AccessLevels
     )
-    $ExistingAccessLevels = Get-S2PersonAccessLevels $PersonID
+    $ExistingAccessLevels = Get-S2PersonAccessLevel $PersonID
     Edit-S2Person -PersonID $PersonID -AccessLevels $(Compare-Object $AccessLevels $ExistingAccessLevels | Select-Object -ExpandProperty InputObject)
 }
 
