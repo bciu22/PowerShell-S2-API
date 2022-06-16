@@ -1,10 +1,9 @@
-Function Connect-S2Service {
 <#
  .Synopsis
-  Establishes a connection to the S2 NETBOX API.
+  Module for interfacing with the S2 NETBOX API.
 
  .Description
-  Establishes a connection to the S2 NETBOX API for querying and modifying data.
+  Module for enterying and querying information from the S2 NETBOX API.
 
  .Parameter Username
   Valid username of an S2 Account
@@ -22,6 +21,11 @@ Function Connect-S2Service {
   Forked from bciu22/PowerShell-S2-API
   https://github.com/bciu22/PowerShell-S2-API/blob/master/src/S2.psm1
 #>
+Function Connect-S2Service {
+    <#
+    .PARAMETER Username
+    .PARAMETER Password
+    #>
     param (
         [parameter(Mandatory=$true)][String] $Username,
         [parameter(Mandatory=$true)][String] $Password,
@@ -316,45 +320,6 @@ Function New-S2Person {
 }
 
 Function Edit-S2Person {
-<#
- .Synopsis
-  Edit an already created person in the S2 system.
-
- .Description
-  Allows for editing the fields that are assocated with an already existing person.
-
- .Parameter PersonID
-  The ID of the person you are targeting.
-
- .Parameter FirstName
-  Used for changing the value of the person's first name.
-
- .Parameter LastName
-  Used for changing the value of the person's last name.
-
- .Parameter MiddleName
-  Used for changing the value of the person's middle name.
-
- .Parameter AccessLevels
-  Specify what Access Levels you want a person to be added to.
-  IMPORTANT: Any Access Levels not specified are removed.
-  
- .Parameter UDF1
-  Specify the value you want stored in the UDF1 field.  Format is going to be the same for the other UDFs.
-  
- .Parameter Undelete
-  Specify this parameter will undelete a deleted person.
-
- .Example 
-  C:\PS> Edit-S2Person -PersonID _100 -AccessLevels "Access Level Group 1","Access Level Group 2","Access Level Group 3"
-  This will edit the access levels of a person with the ID of _100 so that person only has access to the specified Access Levels that
-  are specified at in the command.
-
- .Example 
-  C:\PS> Edit-S2Person -PersonID _100 -Undelete
-  This will undelete (reenable) the person with the ID of _100 if they where previously deleted.
-  Note: They will not have Credntials or AccessLevels when they are undeleted unless you give them access at the time you undelete.
-#>
     param(
         [parameter(Mandatory=$true)][String] $PersonID,
         [String] $FirstName,
@@ -465,12 +430,12 @@ Function Edit-S2Person {
         $param.innerText = $UDF9
         $Parameters.AppendChild($param) | Out-Null
     }
-    if($Undelete)
-    {
-        $param = $xml.CreateElement("DELETED")
-        $param.innerText = "FALSE"
-        $Parameters.AppendChild($param) | Out-Null
-    }
+    # if($Undelete)
+    # {
+    #     $param = $xml.CreateElement("DELETED")
+    #     $param.innerText = "FALSE"
+    #     $Parameters.AppendChild($param) | Out-Null
+    # }
 
     $([XML]$(Invoke-WebRequest -URI "$($S2PROTOCOL)$($S2HOSTNAME)/goforms/nbapi" -Method Post -Body $xml).content).NETBOX.RESPONSE.DETAILS
 }
