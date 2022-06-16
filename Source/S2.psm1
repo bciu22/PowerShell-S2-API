@@ -206,35 +206,6 @@ Function Get-S2PersonPhoto {
 }
 
 Function New-S2Person {
-<#
- .Synopsis
-  Function for creating new person in the S2 system.
-
- .Description
-  Allows for the creation of a new person in the S2 NETBOX system.
-
- .Parameter PersonID
-  If you want to specify a specific Person ID instead of letting the system auto generate one.
-
- .Parameter FirstName
-  Specify the person's first name.
-
- .Parameter LastName
-  Specify the person's last name.
-
- .Parameter MiddleName
-  Specify the person's middle name.
-
- .Parameter AccessLevels
-  Specify what Access Levels you want a person to be added to.  
-  
- .Parameter UDF1
-  Specify the value you want stored in the UDF1 field.  Format is going to be the same for the other UDFs.
-
- .Example 
-  C:\PS> New-S2Person -FirstName John -LastName Smith
-  Will create a person with the First Name of John and Last Name of Smith.
-#>
     param(
         [String] $PersonID,
         [parameter(Mandatory=$true)][String] $FirstName,
@@ -251,7 +222,6 @@ Function New-S2Person {
         [String] $UDF8,
         [String] $UDF9
     )
-
     [xml]$xml = New-Object System.Xml.XmlDocument
     $wrapper = $xml.AppendChild($xml.CreateElement("NETBOX-API"))
     $wrapper.SetAttribute("sessionid",$NETBOXSessionID)
@@ -305,37 +275,37 @@ Function New-S2Person {
         $param.innerText = $UDF3
         $Parameters.AppendChild($param) | Out-Null
     }
-    if($UDF3)
+    if($UDF4)
     {
         $param = $xml.CreateElement("UDF4")
         $param.innerText = $UDF4
         $Parameters.AppendChild($param) | Out-Null
     }
-    if($UDF3)
+    if($UDF5)
     {
         $param = $xml.CreateElement("UDF5")
         $param.innerText = $UDF5
         $Parameters.AppendChild($param) | Out-Null
     }
-    if($UDF3)
+    if($UDF6)
     {
         $param = $xml.CreateElement("UDF6")
         $param.innerText = $UDF6
         $Parameters.AppendChild($param) | Out-Null
     }
-    if($UDF3)
+    if($UDF7)
     {
         $param = $xml.CreateElement("UDF7")
         $param.innerText = $UDF7
         $Parameters.AppendChild($param) | Out-Null
     }
-    if($UDF3)
+    if($UDF8)
     {
         $param = $xml.CreateElement("UDF8")
         $param.innerText = $UDF8
         $Parameters.AppendChild($param) | Out-Null
     }
-    if($UDF3)
+    if($UDF9)
     {
         $param = $xml.CreateElement("UDF9")
         $param.innerText = $UDF9
