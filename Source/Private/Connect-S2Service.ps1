@@ -1,30 +1,26 @@
-<#
- .Synopsis
-  Module for interfacing with the S2 NETBOX API.
-
- .Description
-  Module for enterying and querying information from the S2 NETBOX API.
-
- .Parameter Username
-  Valid username of an S2 Account
-
- .Parameter Password
-  Corresponding password to specified username
-
- .Parameter S2Hostname
-  The network location to the S2 Netbox API server.
-
- .Parameter S2Protocol
-  Specifiy what http protocal to use.  By default it uses http.
-
- .Link
-  Forked from bciu22/PowerShell-S2-API
-  https://github.com/bciu22/PowerShell-S2-API/blob/master/src/S2.psm1
-#>
 Function Connect-S2Service {
     <#
-    .PARAMETER Username
-    .PARAMETER Password
+    .Synopsis
+    Module for interfacing with the S2 NETBOX API.
+
+    .Description
+    Module for enterying and querying information from the S2 NETBOX API.
+
+    .Parameter Username
+    Valid username of an S2 Account
+
+    .Parameter Password
+    Corresponding password to specified username
+
+    .Parameter S2Hostname
+    The network location to the S2 Netbox API server.
+
+    .Parameter S2Protocol
+    Specifiy what http protocal to use.  By default it uses http.
+
+    .Link
+    Forked from bciu22/PowerShell-S2-API
+    https://github.com/bciu22/PowerShell-S2-API/blob/master/src/S2.psm1
     #>
     param (
         [parameter(Mandatory=$true)][String] $Username,
